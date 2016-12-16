@@ -16,14 +16,18 @@
  */
  
  /*
- Version 1
- 	April 12th, 2016
+ Version 1.1 - December 15, 2016
+    Added Reverse Buttons functionality
+    Fixed Issues with some SmartApps
+ Version 1 - April 12th, 2016
     Initial Release
  */
 
 metadata {
 	definition (name: "GoControl Wireless Remote Switch", namespace: "ajpri", author: "Austin Pritchett") {
 		capability "Button"
+        capability "Holdable Button"
+
 		capability "Configuration"
         capability "Battery"
 
@@ -46,6 +50,10 @@ metadata {
         main "button"
 		details(["button", "battery"])
 	}
+    
+    preferences {
+        input name: "reverse", type: "bool", title: "Reverse Buttons", description: "Reverse the top and bottom buttons", required: true
+    }
 }
 
 // parse events into attributes
@@ -66,7 +74,18 @@ def parse(String description) {
 }
 
 def zwaveEvent(physicalgraph.zwave.commands.centralscenev1.CentralSceneNotification cmd) {
-    Integer button = (cmd.sceneNumber) as Integer    
+    Integer button   
+    if(reverse == true){
+    	if(cmd.sceneNumber == 1){
+        	button = 2
+        }else{
+        	button = 1
+        }
+        log.debug button
+    }else{
+    	button = (cmd.sceneNumber) as Integer
+    }
+    	
 
     if(cmd.keyAttributes == 0){
 		createEvent(name: "button", value: "pushed", data: [buttonNumber: button], descriptionText: "$device.displayName button $button was pushed", isStateChange: true)
@@ -108,4 +127,16 @@ def zwaveEvent(physicalgraph.zwave.commands.batteryv1.BatteryReport cmd) {
 
 def configure() {
 	
+}
+
+def installed() {
+	initialize()
+}
+
+def updated() {
+	initialize()
+}
+
+def initialize() {
+	sendEvent(name: "numberOfButtons", value: 2)
 }
