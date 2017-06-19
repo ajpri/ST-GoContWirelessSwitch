@@ -16,7 +16,9 @@
  */
  
  /*
- Version 1.1 - December 15, 2016
+ Version 1.2 - June 19th, 2017
+ 	Exposed "Actuator" Capability
+ Version 1.1 - December 15th, 2016
     Added Reverse Buttons functionality
     Fixed Issues with some SmartApps
  Version 1 - April 12th, 2016
@@ -25,9 +27,9 @@
 
 metadata {
 	definition (name: "GoControl Wireless Remote Switch", namespace: "ajpri", author: "Austin Pritchett") {
+    	capability "Actuator"
 		capability "Button"
         capability "Holdable Button"
-
 		capability "Configuration"
         capability "Battery"
 
