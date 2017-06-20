@@ -17,7 +17,7 @@
  
  /*
  Version 1.2 - June 19th, 2017
- 	Exposed "Actuator & Sensor" Capability
+ 	Exposed "Actuator" & "Sensor" Capability
  Version 1.1 - December 15th, 2016
     Added Reverse Buttons functionality
     Fixed Issues with some SmartApps
