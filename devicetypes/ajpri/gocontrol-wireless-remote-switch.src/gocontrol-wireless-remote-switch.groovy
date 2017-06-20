@@ -17,7 +17,7 @@
  
  /*
  Version 1.2 - June 19th, 2017
- 	Exposed "Actuator" Capability
+ 	Exposed "Actuator & Sensor" Capability
  Version 1.1 - December 15th, 2016
     Added Reverse Buttons functionality
     Fixed Issues with some SmartApps
@@ -32,6 +32,8 @@ metadata {
         capability "Holdable Button"
 		capability "Configuration"
         capability "Battery"
+        capability "Sensor"
+
 
 		fingerprint deviceId:"0x1801", inClusters:"0x5E, 0x86, 0x72, 0x5B, 0x85, 0x59, 0x73, 0x70, 0x80, 0x84, 0x5A, 0x7A", outClusters:"0x5B, 0x20"        
 	}
