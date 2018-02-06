@@ -16,6 +16,14 @@
  */
  
  /*
+ Hubitat Compatibility
+ 
+ Version 1.2b - 5 February 2018
+ 	Initial Compatibility Release
+ 	
+*/
+ 
+ /*
  Version 1.2 - June 19th, 2017
  	Exposed "Actuator" & "Sensor" Capability
  Version 1.1 - December 15th, 2016
@@ -28,31 +36,14 @@
 metadata {
 	definition (name: "GoControl Wireless Remote Switch", namespace: "ajpri", author: "Austin Pritchett") {
     	capability "Actuator"
-		capability "Button"
-        capability "Holdable Button"
+		capability "PushableButton"
+        capability "HoldableButton"
 		capability "Configuration"
         capability "Battery"
         capability "Sensor"
 
 
 		fingerprint deviceId:"0x1801", inClusters:"0x5E, 0x86, 0x72, 0x5B, 0x85, 0x59, 0x73, 0x70, 0x80, 0x84, 0x5A, 0x7A", outClusters:"0x5B, 0x20"        
-	}
-
-	simulator {
-		// TODO: define status and reply messages here
-        status "button 1 pushed":  "command: 5B03, payload: 40 00 01"
-		status "button 2 pushed":  "command: 5B03, payload: 41 00 02"
-	}
-
-	tiles {
-		standardTile("button", "device.button", width: 2, height: 2) {
-			state "default", label: "", icon: "st.unknown.zwave.remote-controller", backgroundColor: "#ffffff"
-		}
-        valueTile("battery", "device.battery", inactiveLabel: false, decoration: "flat", width: 1, height: 1) {
-			state "battery", label:'${currentValue}% battery', unit:""
-		}
-        main "button"
-		details(["button", "battery"])
 	}
     
     preferences {
@@ -77,7 +68,7 @@ def parse(String description) {
 
 }
 
-def zwaveEvent(physicalgraph.zwave.commands.centralscenev1.CentralSceneNotification cmd) {
+def zwaveEvent(hubitat.zwave.commands.centralscenev1.CentralSceneNotification cmd) {
     Integer button   
     if(reverse == true){
     	if(cmd.sceneNumber == 1){
@@ -92,15 +83,19 @@ def zwaveEvent(physicalgraph.zwave.commands.centralscenev1.CentralSceneNotificat
     	
 
     if(cmd.keyAttributes == 0){
-		createEvent(name: "button", value: "pushed", data: [buttonNumber: button], descriptionText: "$device.displayName button $button was pushed", isStateChange: true)
+		//ST: createEvent(name: "button", value: "pushed", data: [buttonNumber: button], descriptionText: "$device.displayName button $button was pushed", isStateChange: true)
+		createEvent(name: "pushed", value: button, descriptionText: "$device.displayName button $button was pushed", isStateChange: true)
     }else if(cmd.keyAttributes == 1){
-		createEvent(name: "button", value: "holdRelease", data: [buttonNumber: button], descriptionText: "$device.displayName button $button was released", isStateChange: true)
+		//createEvent(name: "button", value: "holdRelease", data: [buttonNumber: button], descriptionText: "$device.displayName button $button was released", isStateChange: true)
+		//Need to re-implement holdRelease     	
     }else if(cmd.keyAttributes == 2){
-		createEvent(name: "button", value: "held", data: [buttonNumber: button], descriptionText: "$device.displayName button $button was held", isStateChange: true)
+		//createEvent(name: "button", value: "held", data: [buttonNumber: button], descriptionText: "$device.displayName button $button was held", isStateChange: true)
+    	createEvent(name: "held", value: button, descriptionText: "$device.displayName button $button was held", isStateChange: true)
+    	
     }      
 }
 
-def zwaveEvent(physicalgraph.zwave.commands.wakeupv2.WakeUpNotification cmd) {
+def zwaveEvent(hubitat.zwave.commands.wakeupv2.WakeUpNotification cmd) {
 	def result = [createEvent(descriptionText: "${device.displayName} woke up", isStateChange: false)]
 
 	// Only ask for battery if we haven't had a BatteryReport in a while
@@ -113,7 +108,7 @@ def zwaveEvent(physicalgraph.zwave.commands.wakeupv2.WakeUpNotification cmd) {
     result
 }
 
-def zwaveEvent(physicalgraph.zwave.commands.batteryv1.BatteryReport cmd) {    
+def zwaveEvent(hubitat.zwave.commands.batteryv1.BatteryReport cmd) {    
     def result = []
 	def map = [ name: "battery", unit: "%" ]
 	if (cmd.batteryLevel == 0xFF) {
